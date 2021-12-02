@@ -1,0 +1,120 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Comet Chess</title>
+
+        <meta name="description" content="3354.006 Group Project">
+
+        <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    </head>
+
+    <body>
+        <!--Primary Container-->
+        <div id="app" class="w-screen h-screen flex flex-col justify-center items-center pt-16">
+            <!--Title Bar-->
+            <div class="fixed flex items-center justify-center top-0 left-0 w-screen h-16 bg-yellow-600">
+                <h1 class="text-white font-bold text-2xl">UTD Comet Chess</h1>
+            </div>
+
+            <!--Board-->
+            <div class="flex flex-col">
+                <div v-for="(row, rowIndex) in boardState" class="flex flex-row">
+                    <div class="w-16 h-16 p-2" v-for="(piece, colIndex) in row" v-bind:class="[((rowIndex + colIndex)%2) == 1 ? 'bg-gray-600' : 'bg-gray-300']">
+                        <img :src="getPieceSrc(piece.substring(0,1))" v-bind:class="[(piece.substring(1,2) === 'W') ? 'filter invert' : '']">
+                    </div>
+                </div>
+            </div>
+
+            <div v-show="chatOpen" class="w-64 flex flex-col fixed right-12 bottom-16 overflow-hidden rounded-lg shadow-xl">
+                <div class="flex items-center justify-center bg-green-800 h-12 w-full">
+                    <p class="text-white font-bold text-xl">Chat</p>
+                </div>
+                <div class="flex flex-col h-64 w-full bg-white overflow-y-scroll p-4 gap-2">
+                    <div v-for="message in chatHistory">
+                        <p v-if="message.sender" class="ml-auto py-1 px-4 rounded-md text-sm text-white w-max max-w-full bg-yellow-500">{{message.message}}</p>
+                        <p v-if="!message.sender" class="mr-auto py-1 px-4 rounded-md text-sm text-white w-max max-w-full bg-gray-400">{{message.message}}</p>
+                    </div>
+                </div>
+                <div class="flex flex-row bg-gray-200 items-center h-12 p-2 gap-2">
+                    <input class="w-full h-full bg-gray-400 rounded-md px-2 text-gray-800" v-model="chatMessage" type="text" placeholder="ahh">
+                    <button class="w-32 h-full bg-green-800 text-white font-bold rounded-md" v-on:click="chatHistory.push({'sender': true, 'message':chatMessage}); chatMessage = ''">Send</button>
+                </div>
+            </div>
+
+            
+            <button class="rounded-full fixed bottom-4 right-12 w-10 h-10 bg-green-800 p-2 float-right" v-on:click="chatOpen = !chatOpen">
+                <svg v-show="chatOpen" class="w-full h-full text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z" fill="currentColor" />
+                </svg>
+
+                <svg v-show="!chatOpen" class="w-full h-full text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 13.9633H8V7.96331H14V9.96331H11.4142L16.7438 15.2929L15.3296 16.7071L10 11.3775L10 13.9633Z" fill="currentColor" />
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M1 19C1 21.2091 2.79086 23 5 23H19C21.2091 23 23 21.2091 23 19V5C23 2.79086 21.2091 1 19 1H5C2.79086 1 1 2.79086 1 5V19ZM5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21Z" fill="currentColor" />
+                </svg>
+            </button>
+        </div>
+    </body>
+</html>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            chatOpen: true,
+            chatMessage: "",
+            chatHistory: [
+                {
+                    "sender": true,
+                    "message": "hi"
+                },
+                {
+                    "sender": false,
+                    "message": "hey"
+                }
+            ],
+            boardState:[
+                ["RW", "HW", "BW", "KW", "QW", "BW", "HW", "RW"],
+                ["PW", "PW", "PW", "PW", "PW", "PW", "PW", "PW"],
+                ["", "", "", "", "", "", "", ""],
+                ["", "", "", "", "", "", "", ""],
+                ["", "", "", "", "", "", "", ""],
+                ["", "", "", "", "", "", "", ""],
+                ["PB", "PB", "PB", "PB", "PB", "PB", "PB", "PB"],
+                ["RB", "HB", "BB", "KB", "QB", "BB", "HB", "RB"]
+            ],
+            getPieceSrc: function(char)
+            {
+                if(char === 'P')
+                {
+                    return "/pawn.png"
+                }
+                else if(char == 'R')
+                {
+                    return "/rook.png"
+                }
+                else if(char == 'H')
+                {
+                    return "/horse.png"
+                }
+                else if(char == 'B')
+                {
+                    return "/bishop.png"
+                }
+                else if(char == 'K')
+                {
+                    return "/king.png"
+                }
+                else if(char == 'Q')
+                {
+                    return "/queen.png"
+                }
+                return ""
+            }
+        }
+    })
+</script>
